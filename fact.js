@@ -157,5 +157,7 @@ exports.handler = function (event, context) {
     const alexa = Alexa.handler(event, context);
     alexa.APP_ID = APP_ID;
     alexa.registerHandlers(handlers);
+    // To enable string internationalization (i18n) features, set a resources object.
+    alexa.resources = languageStrings;
     alexa.execute();
 };
