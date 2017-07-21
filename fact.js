@@ -119,7 +119,7 @@ const handlers = {
         var parent = this;
         getWeather('Seattle',function(err, data) {
             let weather = data.weather[0].main;
-            let temperature = (data.main.temp - 273.15, 5).toFixed(1);
+            let temperature = (data.main.temp - 273.15).toFixed(1);
             let tempChoice = (temperature >= 20) ? 'Hot' : 'Cold';
             switch (weather) {
                 case 'Thunderstorm':
