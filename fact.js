@@ -17,20 +17,20 @@ var http = require('http');
 var url = 'http://api.openweathermap.org/data/2.5/weather?zip=98101&APPID=1e1fdbbbd0b6e9b797cf758f7a7836d0';
 var json = {
     "Clear": {
-        "Hot": ["Salad", "Ice Cream", "Barbecue", "Soup", "Prawn cocktail", "ceviche", "dim sum", "Pizza"],
-        "Cold": ["Pasta with pesto", "Chicken strips", "Chicken avocado wraps", "Double Bacon Burger", "Pad thai noodles", "Pizza", "calzone"]
+        "Hot": ["Salad", "Ice Cream", "Barbecue", "Soup", "Prawn cocktail", "Burger", "Tomato", "Pizza"],
+        "Cold": ["Pasta with pesto", "Chicken strips", "Chicken avocado wraps", "Double Bacon Burger", "Pad thai noodles", "Pizza", "Pizza Calzone"]
     },
     "Snow": {
-        "Hot": ["Putin", "Gnocchi", "Beef Strognoff", "Raclette", "Doner kebab", "Pizza"],
-        "Cold": ["Putin", "Gnocchi", "Beef Strognoff", "Raclette", "Doner kebab", "Pizza"]
+        "Hot": ["Putin", "Gnocchi", "Beef", "Raclette", "Doner kebab", "Pizza"],
+        "Cold": ["Putin", "Gnocchi", "Beef", "Raclette", "Doner kebab", "Pizza"]
     },
     "Rain": {
         "Hot": ["Burgers and chips", "Chicken and mushroom pie", "Beef ragout", "hot dog", "ham and cheese sandwich", "Pizza"],
-        "Cold": ["Donuts", "Gyoza dumplings", "shwarma", "bratwurst", "Chow Mien", "Raviolli", "Pizza"]
+        "Cold": ["Donuts", "Gyoza dumplings", "Kebab", "bratwurst", "Chow Mien", "Raviolli", "Pizza"]
     },
     "Clouds": {
-        "Hot": ["Spaghetti", "Tagliatella", "Milanesa", "burrito", "choripan", "Hot Dog", "Pizza"],
-        "Cold": ["Flan", "Mousse", "Cake", "Pho", "empanadas", "Croissant", "Pizza"]
+        "Hot": ["Spaghetti", "Tagliatella", "Milanesa", "burrito", "Tapas", "Hot Dog", "Pizza"],
+        "Cold": ["Flan", "Mousse", "Cake", "Pho", "Hot Pasta", "Croissant", "Pizza"]
     },
     "Extreme": {
         "Hot": ["Eat whatever you have in your fridge"],
@@ -168,20 +168,13 @@ const languageStrings = {
 
 const handlers = {
     'LaunchRequest': function () {
-        this.emit('GetFact');
-    },
-    'GetNewFactIntent': function () {
-        this.emit('GetFact');
+        this.emit('FoodChoice');
     },
     'FoodChoice': function () {
         // Get a random space fact from the space facts list
         // Use this.t() to get corresponding language data
-        const factArr = this.t('FACTS');
-        const factIndex = Math.floor(Math.random() * factArr.length);
-        const randomFact = factArr[factIndex];
 
         // Create speech output
-        var speechOutput = this.t('GET_FACT_MESSAGE') + randomFact;
         var parent = this;
         getWeather('Seattle',function(err, data) {
             let weather = data.weather[0].main;
@@ -194,10 +187,14 @@ const handlers = {
                     weather = 'Rain';
                     break;
             }
-            var items = json[weather][tempChoice];
-            var result = items[Math.floor((Math.random() * items.size))];
+            let items = json[weather][tempChoice];
+            console.log(items);
+            const index = Math.floor(Math.random() * items.length);
+            console.log(index);
+            let result = items[index];
             console.log(result);
-            parent.emit(':tellWithCard', result, parent.t('SKILL_NAME'), result);
+            let sentence = 'You should eat ' + result;
+            parent.emit(':tellWithCard', sentence, parent.t('SKILL_NAME'), sentence);
         });
     },
     'AMAZON.HelpIntent': function () {
@@ -214,8 +211,6 @@ const handlers = {
 };
 
 exports.handler = function (event, context) {
-    console.log(event);
-    console.log(context);
     const alexa = Alexa.handler(event, context);
     alexa.APP_ID = APP_ID;
     // To enable string internationalization (i18n) features, set a resources object.
