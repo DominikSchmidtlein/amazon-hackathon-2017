@@ -119,7 +119,7 @@ const handlers = {
         var parent = this;
         getWeather('Seattle',function(err, data) {
             let weather = data.weather[0].main;
-            let temperature = (data.main.temp - 32) * (5/9);
+            let temperature = (data.main.temp - 273.15, 5).toFixed(1);
             let tempChoice = (temperature >= 20) ? 'Hot' : 'Cold';
             switch (weather) {
                 case 'Thunderstorm':
@@ -134,7 +134,9 @@ const handlers = {
             console.log(index);
             let result = items[index];
             console.log(result);
-            let sentence = 'You should eat ' + result;
+            let sentence = 'Because the temperature is ' + temperature + ' degres Celsius, and the weather is ' +
+                data.weather[0].description +
+                ', you should eat' + result;
             parent.emit(':tellWithCard', sentence, parent.t('SKILL_NAME'), sentence);
         });
     },
