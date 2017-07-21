@@ -75,6 +75,38 @@ var json = {
     });
 }
 
+const languageStrings = {
+    'en': {
+        translation: {
+            SKILL_NAME: 'Marriage Saver',
+            GET_FACT_MESSAGE: "Here's my suggestion for your next meal: ",
+            HELP_MESSAGE: 'You can say whats for dinner, or, you can say exit... What can I help you with?',
+            HELP_REPROMPT: 'What can I help you with?',
+            STOP_MESSAGE: 'Goodbye!',
+        },
+    },
+    'en-US': {
+        translation: {
+            SKILL_NAME: 'American Space Facts',
+        },
+    },
+    'en-GB': {
+        translation: {
+            SKILL_NAME: 'British Space Facts',
+        },
+    },
+    'de': {
+        translation: {
+            SKILL_NAME: 'Weltraumwissen auf Deutsch',
+            GET_FACT_MESSAGE: 'Hier sind deine Fakten: ',
+            HELP_MESSAGE: 'Du kannst sagen, „Nenne mir einen Fakt über den Weltraum“, oder du kannst „Beenden“ sagen... Wie kann ich dir helfen?',
+            HELP_REPROMPT: 'Wie kann ich dir helfen?',
+            STOP_MESSAGE: 'Auf Wiedersehen!',
+        },
+    },
+};
+
+
 const handlers = {
     'LaunchRequest': function () {
         this.emit('FoodChoice');
