@@ -13,6 +13,67 @@
 const Alexa = require('alexa-sdk');
 
 const APP_ID = undefined;  // TODO replace with your app ID (OPTIONAL).
+var http = require('http');
+var url = 'http://api.openweathermap.org/data/2.5/weather?zip=98101&APPID=1e1fdbbbd0b6e9b797cf758f7a7836d0';
+var json = {
+    "Clear": {
+        "Hot": ["Salad", "Ice Cream", "Barbecue", "Soup", "Prawn cocktail", "ceviche", "dim sum", "Pizza"],
+        "Cold": ["Pasta with pesto", "Chicken strips", "Chicken avocado wraps", "Double Bacon Burger", "Pad thai noodles", "Pizza", "calzone"]
+    },
+    "Snow": {
+        "Hot": ["Putin", "Gnocchi", "Beef Strognoff", "Raclette", "Doner kebab", "Pizza"],
+        "Cold": ["Putin", "Gnocchi", "Beef Strognoff", "Raclette", "Doner kebab", "Pizza"]
+    },
+    "Rain": {
+        "Hot": ["Burgers and chips", "Chicken and mushroom pie", "Beef ragout", "hot dog", "ham and cheese sandwich", "Pizza"],
+        "Cold": ["Donuts", "Gyoza dumplings", "shwarma", "bratwurst", "Chow Mien", "Raviolli", "Pizza"]
+    },
+    "Clouds": {
+        "Hot": ["Spaghetti", "Tagliatella", "Milanesa", "burrito", "choripan", "Hot Dog", "Pizza"],
+        "Cold": ["Flan", "Mousse", "Cake", "Pho", "empanadas", "Croissant", "Pizza"]
+    },
+    "Extreme": {
+        "Hot": ["Eat whatever you have in your fridge"],
+        "Cold": ["Eat whatever you have in your fridge"]
+    }
+};
+    function getWeather(zip, cb) {
+    http.get(url, (res) => {
+        const { statusCode } = res;
+        const contentType = res.headers['content-type'];
+
+        let error;
+        if (statusCode !== 200) {
+            error = new Error('Request Failed.\n' +
+                `Status Code: ${statusCode}`);
+        } else if (!/^application\/json/.test(contentType)) {
+            error = new Error('Invalid content-type.\n' +
+                `Expected application/json but received ${contentType}`);
+        }
+        if (error) {
+            console.error(error.message);
+            // consume response data to free up memory
+            res.resume();
+            return;
+        }
+
+        res.setEncoding('utf8');
+        let rawData = '';
+        res.on('data', (chunk) => { rawData += chunk; });
+        res.on('end', () => {
+            try {
+                const parsedData = JSON.parse(rawData);
+                console.log(parsedData);
+                cb(null, parsedData);
+            } catch (e) {
+                console.error(e.message);
+            }
+        });
+    }).on('error', (e) => {
+        console.error(`Got error: ${e.message}`);
+        cb(e);
+    });
+}
 
 const languageStrings = {
     'en': {
@@ -120,8 +181,24 @@ const handlers = {
         const randomFact = factArr[factIndex];
 
         // Create speech output
-        const speechOutput = this.t('GET_FACT_MESSAGE') + randomFact;
-        this.emit(':tellWithCard', speechOutput, this.t('SKILL_NAME'), randomFact);
+        var speechOutput = this.t('GET_FACT_MESSAGE') + randomFact;
+        var parent = this;
+        getWeather('Seattle',function(err, data) {
+            let weather = data.weather[0].main;
+            let temperature = (data.main.temp - 32) * (5/9);
+            let tempChoice = (temperature >= 20) ? 'Hot' : 'Cold';
+            switch (weather) {
+                case 'Thunderstorm':
+                case 'Drizzle':
+                case 'Additional':
+                    weather = 'Rain';
+                    break;
+            }
+            var items = json[weather][tempChoice];
+            var result = items[Math.floor((Math.random() * items.size))];
+            console.log(result);
+            parent.emit(':tellWithCard', result, parent.t('SKILL_NAME'), result);
+        });
     },
     'AMAZON.HelpIntent': function () {
         const speechOutput = this.t('HELP_MESSAGE');
@@ -137,6 +214,8 @@ const handlers = {
 };
 
 exports.handler = function (event, context) {
+    console.log(event);
+    console.log(context);
     const alexa = Alexa.handler(event, context);
     alexa.APP_ID = APP_ID;
     // To enable string internationalization (i18n) features, set a resources object.
