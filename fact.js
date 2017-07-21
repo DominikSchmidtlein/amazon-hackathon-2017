@@ -134,7 +134,7 @@ const handlers = {
             console.log(index);
             let result = items[index];
             console.log(result);
-            let sentence = 'Because the temperature is ' + temperature + ' degres Celsius, and the weather is ' +
+            let sentence = 'Because the temperature is ' + temperature + ' degrees Celsius, and the weather is ' +
                 data.weather[0].description +
                 ', you should eat' + result;
             parent.emit(':tellWithCard', sentence, parent.t('SKILL_NAME'), sentence);
