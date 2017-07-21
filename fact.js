@@ -112,7 +112,7 @@ const handlers = {
     'GetNewFactIntent': function () {
         this.emit('GetFact');
     },
-    'GetFact': function () {
+    'FoodChoice': function () {
         // Get a random space fact from the space facts list
         // Use this.t() to get corresponding language data
         const factArr = this.t('FACTS');
